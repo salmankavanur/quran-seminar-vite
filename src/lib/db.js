@@ -1,6 +1,15 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-const MONGODB_URI = 'mongodb://127.0.0.1:27017/quranic_seminar';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from the server directory
+dotenv.config({ path: join(__dirname, '../server/.env') });
+
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/quranic_seminar';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable inside .env');

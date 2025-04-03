@@ -12,16 +12,17 @@ const __dirname = dirname(__filename);
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: '*', // Allow all origins in development
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type']
-}));
 app.use(express.json());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:8080',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Accept'],
+  credentials: true
+}));
 
 let isConnected = false;
 
-// Connect to MongoDB
+// Connect to MongoDB and start server
 async function startServer() {
   try {
     console.log('Attempting to connect to MongoDB...');
@@ -29,35 +30,30 @@ async function startServer() {
     isConnected = true;
     console.log('MongoDB connection successful');
 
-    const PORT = process.env.PORT || 5001;
-    
     const PORT = parseInt(process.env.PORT) || 5001;
     const HOST = process.env.HOST || 'localhost';
     
-    try {
-      const server = app.listen(PORT)
-        .on('error', (err) => {
-          if (err.code === 'EADDRINUSE') {
-            console.log(`Port ${PORT} is busy, trying ${PORT + 1}...`);
-            server.close();
-            app.listen(PORT + 1, () => {
-              console.log(`Server running on port ${PORT + 1}`);
-              console.log(`Test the API at http://${HOST}:${PORT + 1}/api/test`);
-            });
-          } else {
-            console.error('Server error:', err);
-          }
-        })
-        .on('listening', () => {
-          console.log(`Server running on port ${PORT}`);
-          console.log(`Test the API at http://${HOST}:${PORT}/api/test`);
-        });
-    } catch (err) {
-      console.error('Failed to connect to MongoDB:', err.message);
-      console.error('Please make sure MongoDB is installed and running on your system');
-      process.exit(1);
-    }
-    
+    app.listen(PORT)
+      .on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+          console.log(`Port ${PORT} is busy, trying ${PORT + 1}...`);
+          app.listen(PORT + 1, () => {
+            console.log(`Server running on port ${PORT + 1}`);
+            console.log(`Test the API at http://${HOST}:${PORT + 1}/api/test`);
+          });
+        } else {
+          console.error('Server error:', err);
+        }
+      })
+      .on('listening', () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`Test the API at http://${HOST}:${PORT}/api/test`);
+      });
+  } catch (err) {
+    console.error('Failed to start server:', err.message);
+    process.exit(1);
+  }
+}
 
 // Test route
 app.get('/api/test', (req, res) => {
