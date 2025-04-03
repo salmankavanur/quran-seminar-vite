@@ -66,13 +66,21 @@ const RegistrationForm = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        mode: 'cors',
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
-    
 
-      const data = await response.json();
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await response.json();
+      } else {
+        // Handle non-JSON response
+        const text = await response.text();
+        throw new Error(`Server returned non-JSON response: ${text}`);
+      }
       
       if (!response.ok) {
         console.error('Server error response:', data);
