@@ -31,29 +31,33 @@ async function startServer() {
 
     const PORT = process.env.PORT || 5001;
     
-    const server = app.listen(PORT)
-      .on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-          console.log(`Port ${PORT} is busy, trying ${PORT + 1}...`);
-          server.close();
-          app.listen(PORT + 1, () => {
-            console.log(`Server running on port ${PORT + 1}`);
-            console.log(`Test the API at http://localhost:${PORT + 1}/api/test`);
-          });
-        } else {
-          console.error('Server error:', err);
-        }
-      })
-      .on('listening', () => {
-        console.log(`Server running on port ${PORT}`);
-        console.log(`Test the API at http://localhost:${PORT}/api/test`);
-      });
-  } catch (err) {
-    console.error('Failed to connect to MongoDB:', err.message);
-    console.error('Please make sure MongoDB is installed and running on your system');
-    process.exit(1);
-  }
-}
+    const PORT = parseInt(process.env.PORT) || 5001;
+    const HOST = process.env.HOST || 'localhost';
+    
+    try {
+      const server = app.listen(PORT)
+        .on('error', (err) => {
+          if (err.code === 'EADDRINUSE') {
+            console.log(`Port ${PORT} is busy, trying ${PORT + 1}...`);
+            server.close();
+            app.listen(PORT + 1, () => {
+              console.log(`Server running on port ${PORT + 1}`);
+              console.log(`Test the API at http://${HOST}:${PORT + 1}/api/test`);
+            });
+          } else {
+            console.error('Server error:', err);
+          }
+        })
+        .on('listening', () => {
+          console.log(`Server running on port ${PORT}`);
+          console.log(`Test the API at http://${HOST}:${PORT}/api/test`);
+        });
+    } catch (err) {
+      console.error('Failed to connect to MongoDB:', err.message);
+      console.error('Please make sure MongoDB is installed and running on your system');
+      process.exit(1);
+    }
+    
 
 // Test route
 app.get('/api/test', (req, res) => {

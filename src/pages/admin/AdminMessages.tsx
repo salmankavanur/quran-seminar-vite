@@ -47,10 +47,12 @@ const AdminMessages = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/messages');
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/messages`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
       }
+  
       const data = await response.json();
       setMessages(data);
     } catch (error) {
@@ -64,6 +66,7 @@ const AdminMessages = () => {
       setIsLoading(false);
     }
   };
+  
 
   const handleViewMessage = async (message: Message) => {
     setSelectedMessage(message);
@@ -71,13 +74,14 @@ const AdminMessages = () => {
 
     if (!message.read) {
       try {
-        const response = await fetch(`http://localhost:5001/api/messages/${message._id}/read`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/messages/${message._id}/read`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ read: true })
         });
+        
         
         if (response.ok) {
           setMessages(prevMessages =>
@@ -120,10 +124,10 @@ const AdminMessages = () => {
     if (!messageToDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5001/api/messages/${messageToDelete._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/messages/${messageToDelete._id}`, {
         method: 'DELETE',
       });
-
+    
       if (response.ok) {
         setMessages(messages.filter(m => m._id !== messageToDelete._id));
         toast({

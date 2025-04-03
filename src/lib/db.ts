@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const MONGODB_URI = 'mongodb://localhost:27017/Quranic-seminar';
+dotenv.config(); // Load variables from .env
+
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env');
+  throw new Error('❌ Please define the MONGODB_URI environment variable inside .env');
 }
 
+// Global cache for development (to prevent re-connection on hot reloads)
 let cached = global.mongoose;
 
 if (!cached) {
@@ -13,9 +17,7 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
+  if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
     const opts = {
@@ -23,8 +25,11 @@ async function connectDB() {
     };
 
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('Connected to MongoDB');
+      console.log('✅ Connected to MongoDB');
       return mongoose;
+    }).catch((err) => {
+      console.error('❌ MongoDB connection failed:', err.message);
+      throw err;
     });
   }
 
@@ -38,4 +43,4 @@ async function connectDB() {
   return cached.conn;
 }
 
-export default connectDB; 
+export default connectDB;

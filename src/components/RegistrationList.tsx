@@ -30,10 +30,12 @@ export function RegistrationList() {
 
   const fetchRegistrations = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/registrations');
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations`);
+      
       if (!response.ok) {
         throw new Error('Failed to fetch registrations');
       }
+  
       const data = await response.json();
       setRegistrations(data);
     } catch (error) {
@@ -43,6 +45,7 @@ export function RegistrationList() {
       setIsLoading(false);
     }
   };
+  
 
   const handleRegistrationClick = (registration: Registration) => {
     setSelectedRegistration(registration);

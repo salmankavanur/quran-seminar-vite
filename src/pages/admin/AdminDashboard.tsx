@@ -68,13 +68,13 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // Fetch total registrations
-        const registrationsResponse = await fetch('http://localhost:5001/api/registrations');
+        const registrationsResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/registrations`);
         const registrationsData = await registrationsResponse.json();
-        
+      
         // Fetch total messages
-        const messagesResponse = await fetch('http://localhost:5001/api/messages');
+        const messagesResponse = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/messages`);
         const messagesData = await messagesResponse.json();
-
+      
         // Get latest 5 registrations
         const latestRegistrations = registrationsData
           .sort((a: Registration, b: Registration) => 
